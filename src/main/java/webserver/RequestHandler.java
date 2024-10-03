@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static webserver.HTTPContentType.*;
-import static webserver.HttpHeader.*;
-import static webserver.HttpMethod.*;
+import static webserver.HttpContentType.*;
+import static webserver.HttpHeaderType.*;
+import static webserver.HttpMethodType.*;
 import static webserver.StatusCode.*;
 import static webserver.Url.*;
 import static webserver.UserQueryKey.*;
@@ -40,17 +40,9 @@ public class RequestHandler implements Runnable{
             DataOutputStream dos = new DataOutputStream(out);
 
 
-
-            byte[] body;
-            String request = br.readLine();                                 //start Line
-            if(request == null){
-                return;
-            }
-
-            //요청 라인 파싱
-            String[] requestTokens = request.split(" ");
-            String requestMethod = requestTokens[0];
-            String requestUrl = requestTokens[1];
+            HttpRequest httpRequest = HttpRequest.from(br);             //HttpRequest 객체 생성
+            String requestMethod = httpRequest.getMethod();
+            String requestUrl = httpRequest.getPath();
 
             //루트 경로 처리
             if(requestUrl.equals("/")){
@@ -79,12 +71,12 @@ public class RequestHandler implements Runnable{
                 handleUserListRequest(br, dos);
             }                                                                   //요구사항 1  (로그인 후에 파읽을 요청하는 경우를 방지하기 위해 else로 묶어주었음)
             else if(Files.exists(Paths.get(filePath))){                         //요청한 파일을 읽어 응답
-                body = Files.readAllBytes(Paths.get(filePath));
+                byte[] body = Files.readAllBytes(Paths.get(filePath));
                 response200Header(dos, getConTentType(requestUrl), body.length);
                 responseBody(dos, body);
             }
             else{                                                           //요청한 파일이 존재하지 않음
-                body = NOT_FOUND.getCode().getBytes();                   //문자열을 바이트코드로 인코딩
+                byte[] body = NOT_FOUND.getCode().getBytes();                   //문자열을 바이트코드로 인코딩
                 response404Header(dos, body.length);
                 responseBody(dos, body);
             }

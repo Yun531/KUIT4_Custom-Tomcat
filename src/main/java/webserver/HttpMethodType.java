@@ -1,12 +1,12 @@
 package webserver;
 
-public enum HttpMethod {
+public enum HttpMethodType {
     GET("GET"),
     POST("POST");
 
     final String value;
 
-    private HttpMethod(String value) {
+    private HttpMethodType(String value) {
         this.value = value;
     }
 

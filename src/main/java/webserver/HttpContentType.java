@@ -1,12 +1,12 @@
 package webserver;
 
-public enum HTTPContentType {
+public enum HttpContentType {
     HTML("text/html"),
     CSS("text/css");
 
     String code;
 
-    HTTPContentType(String code){
+    HttpContentType(String code){
         this.code = code;
     }
 
