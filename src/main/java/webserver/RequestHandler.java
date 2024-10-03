@@ -74,7 +74,7 @@ public class RequestHandler implements Runnable{
             }                                                                   //요구사항 1  (로그인 후에 파읽을 요청하는 경우를 방지하기 위해 else로 묶어주었음)
             else if(Files.exists(Paths.get(filePath))){                         //요청한 파일을 읽어 응답
                 body = Files.readAllBytes(Paths.get(filePath));
-                response200Header(dos, body.length);
+                response200Header(dos, getConTentType(requestUrl), body.length);
                 responseBody(dos, body);
             }
             else{                                                           //요청한 파일이 존재하지 않음
@@ -170,7 +170,7 @@ public class RequestHandler implements Runnable{
 
         if(login){                                                                      //로그인 기록 확인
             byte[] userList = Files.readAllBytes(Paths.get(WEBAPP_PATH + "/user/list.html"));
-            response200Header(dos, userList.length);
+            response200Header(dos, "text/html", userList.length);
             responseBody(dos, userList);
         }
         if(!login){
@@ -179,16 +179,28 @@ public class RequestHandler implements Runnable{
 
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {     //성공적인 HTTP 응답 헤더를 클라이언트로 전송
+    private String getConTentType(String url){
+        if (url.endsWith(".html")) {
+            return "text/html";
+        }
+        if (url.endsWith(".css")) {
+            return "text/css";
+        }
+
+        return "";                      //html과 css 종류만 가정
+    }
+
+    private void response200Header(DataOutputStream dos, String contentType, int lengthOfBodyContent) {     //성공적인 HTTP 응답 헤더를 클라이언트로 전송, contentType 고려
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage());
         }
     }
+
 
     private void response404Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
