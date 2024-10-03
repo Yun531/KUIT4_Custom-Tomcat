@@ -59,52 +59,18 @@ public class RequestHandler implements Runnable{
 //                responseBody(dos, body);
 //            }
 
-            // 요구사항 2, GET 회원 가입
-            if(requestMethod.equals("GET") && requestUrl.equals("/user/signup")){
-                String queryString = requestUrl.split("\\?")[1];
-                Map<String, String> queryParams = HttpRequestUtils.parseQueryParameter(queryString);        //주어진 쿼리 문자열을 파싱해여 map 형태로 반환
-
-                String userId = queryParams.get("userId");
-                String password = queryParams.get("password");
-                String name = queryParams.get("name");
-                String email = queryParams.get("email");
-                User user = new User(userId, password, name, email);            //User 객체 생성
-
-                if (userRepository.findUserById(userId) == null){
-                    userRepository.addUser(user);
-                }
-
-                response302Header(dos, "/index.html");
+            // 요구사항 2, GET 회원 가입 (url에 쿼리 스트링 포함)
+            if(requestMethod.equals("GET") && requestUrl.startsWith("/user/signup")){           // todo /user.signup.html 이 없는데 괜찮나?
+                handleSignUpGet(requestUrl, dos);
             } // 요구사항 3, POST 회원 가입
             else if (requestMethod.equals("POST") && requestUrl.equals("/user/signup")) {
-                int requestContentLength = 0;
-
-                while (true) {                                              //해더 영역 스킵
-                    String headerLine = br.readLine();
-                    if (headerLine.equals("")) {
-                        break;
-                    }
-                    if (headerLine.startsWith("Content-Length")) {          //바디의 길이가 적혀 있는 영역
-                        requestContentLength = Integer.parseInt(headerLine.split(": ")[1]);
-                    }
-                }
-
-                String requestBody = IOUtils.readData(br, requestContentLength);                        //바디 정보 읽어 옴
-                Map<String, String> bodyParams = HttpRequestUtils.parseQueryParameter(requestBody);     //주어진 쿼리 문자열 파싱하여 map 형태로 변환
-
-
-                String userId = bodyParams.get("userId");
-                String password = bodyParams.get("password");
-                String name = bodyParams.get("name");
-                String email = bodyParams.get("email");
-                User user = new User(userId, password, name, email);
-
-                if (userRepository.findUserById(userId) == null) {
-                    userRepository.addUser(user);
-                }
-
-                response302Header(dos, "/index.html");
-            }  //요구사항 1  (로그인 후에 파읽을 요청하는 경우를 방지하기 위해 else로 묶어주었음
+                handleSignUpPost(br, dos);
+            }
+            else if (requestMethod.equals("POST") && requestUrl.equals("/user/login")) {
+                // 요구사항5 : 로그인 요청
+                handleLoginPost(br, dos);
+            }
+                //요구사항 1  (로그인 후에 파읽을 요청하는 경우를 방지하기 위해 else로 묶어주었음
             else if(Files.exists(Paths.get(filePath))){                      //요청한 파일을 읽어 응답
                 body = Files.readAllBytes(Paths.get(filePath));
                 response200Header(dos, body.length);
@@ -119,6 +85,73 @@ public class RequestHandler implements Runnable{
         } catch (IOException e) {
             log.log(Level.SEVERE,e.getMessage());
         }
+    }
+
+    private void handleSignUpGet(String requestUrl, DataOutputStream dos){
+        String queryString = requestUrl.split("\\?")[1];
+        Map<String, String> queryParams = HttpRequestUtils.parseQueryParameter(queryString);        //주어진 쿼리 문자열을 파싱해여 map 형태로 반환
+
+        String userId = queryParams.get("userId");
+        String password = queryParams.get("password");
+        String name = queryParams.get("name");
+        String email = queryParams.get("email");
+        User user = new User(userId, password, name, email);            //User 객체 생성
+
+        if (userRepository.findUserById(userId) == null){
+            userRepository.addUser(user);
+        }
+
+        response302Header(dos, "/index.html");
+    }
+
+    private void handleSignUpPost(BufferedReader br, DataOutputStream dos) throws IOException {
+        String requestBody = requestBodyFromPost(br);                        //바디 정보 읽어 옴
+        Map<String, String> bodyParams = HttpRequestUtils.parseQueryParameter(requestBody);     //주어진 쿼리 문자열 파싱하여 map 형태로 변환
+
+
+        String userId = bodyParams.get("userId");
+        String password = bodyParams.get("password");
+        String name = bodyParams.get("name");
+        String email = bodyParams.get("email");
+        User user = new User(userId, password, name, email);
+
+        if (userRepository.findUserById(userId) == null) {
+            userRepository.addUser(user);
+        }
+
+        response302Header(dos, "/index.html");
+    }
+
+    private void handleLoginPost(BufferedReader br, DataOutputStream dos) throws IOException {
+        String requestBody = requestBodyFromPost(br);
+        Map<String, String> bodyParams = HttpRequestUtils.parseQueryParameter(requestBody);
+
+        String userId = bodyParams.get("userId");
+        String password = bodyParams.get("password");
+
+        User user = userRepository.findUserById(userId);
+
+        if (user != null && user.getPassword().equals(password)) {
+            response302HeaderWithCookie(dos, "/index.html", "logined=true");
+        } else {
+            response302Header(dos, "/logined_failed.html");
+        }
+    }
+
+    private String requestBodyFromPost(BufferedReader br) throws IOException {
+        int requestContentLength = 0;
+
+        while (true) {                                              //해더 영역 스킵
+            String headerLine = br.readLine();
+            if (headerLine.equals("")) {
+                break;
+            }
+            if (headerLine.startsWith("Content-Length")) {          //바디의 길이가 적혀 있는 영역
+                requestContentLength = Integer.parseInt(headerLine.split(": ")[1]);
+            }
+        }
+
+        return IOUtils.readData(br, requestContentLength);
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {     //성공적인 HTTP 응답 헤더를 클라이언트로 전송
@@ -146,6 +179,17 @@ public class RequestHandler implements Runnable{
     private void response302Header(DataOutputStream dos, String url) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: " + url + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage());
+        }
+    }
+
+    private void response302HeaderWithCookie(DataOutputStream dos, String url, String cookie) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found\r\n");
+            dos.writeBytes("Set-Cookie: " + cookie + "\r\n");
             dos.writeBytes("Location: " + url + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {

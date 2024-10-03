@@ -26,9 +26,9 @@ public class MemoryUserRepository implements Repository{
         users.put(user.getUserId(), user);
     }       //새로운 사용자를 추가
 
-    public User findUserById(String userId) {
+    public User findUserById(String userId) {                                   //사용자 ID로 사용자를 검색
         return users.get(userId);
-    }       //사용자 ID로 사용자를 검색
+    }
 
     public Collection<User> findAll() {
         return users.values();
