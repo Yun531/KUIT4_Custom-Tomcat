@@ -59,19 +59,20 @@ public class RequestHandler implements Runnable{
 //                responseBody(dos, body);
 //            }
 
-            // 요구사항 2, GET 회원 가입 (url에 쿼리 스트링 포함)
-            if(requestMethod.equals("GET") && requestUrl.startsWith("/user/signup")){           // todo /user.signup.html 이 없는데 괜찮나?
+
+            if(requestMethod.equals("GET") && requestUrl.startsWith("/user/signup")){           // 요구사항 2, GET 회원 가입 (url에 쿼리 스트링 포함)
                 handleSignUpGet(requestUrl, dos);
-            } // 요구사항 3, POST 회원 가입
-            else if (requestMethod.equals("POST") && requestUrl.equals("/user/signup")) {
+            }
+            else if (requestMethod.equals("POST") && requestUrl.equals("/user/signup")) {       // 요구사항 3, POST 회원 가입
                 handleSignUpPost(br, dos);
             }
-            else if (requestMethod.equals("POST") && requestUrl.equals("/user/login")) {
-                // 요구사항5 : 로그인 요청
+            else if (requestMethod.equals("POST") && requestUrl.equals("/user/login")) {        // 요구사항 5, 로그인 요청
                 handleLoginPost(br, dos);
             }
-                //요구사항 1  (로그인 후에 파읽을 요청하는 경우를 방지하기 위해 else로 묶어주었음
-            else if(Files.exists(Paths.get(filePath))){                      //요청한 파일을 읽어 응답
+            else if (requestUrl.equals("/user/userList")) {                                     // 요구사항 6, 유저 리스트 요청 처리
+                handleUserListRequest(br, dos);
+            }                                                                   //요구사항 1  (로그인 후에 파읽을 요청하는 경우를 방지하기 위해 else로 묶어주었음)
+            else if(Files.exists(Paths.get(filePath))){                         //요청한 파일을 읽어 응답
                 body = Files.readAllBytes(Paths.get(filePath));
                 response200Header(dos, body.length);
                 responseBody(dos, body);
@@ -105,7 +106,7 @@ public class RequestHandler implements Runnable{
     }
 
     private void handleSignUpPost(BufferedReader br, DataOutputStream dos) throws IOException {
-        String requestBody = requestBodyFromPost(br);                        //바디 정보 읽어 옴
+        String requestBody = getRequestBodyFromPost(br);                        //바디 정보 읽어 옴
         Map<String, String> bodyParams = HttpRequestUtils.parseQueryParameter(requestBody);     //주어진 쿼리 문자열 파싱하여 map 형태로 변환
 
 
@@ -123,7 +124,7 @@ public class RequestHandler implements Runnable{
     }
 
     private void handleLoginPost(BufferedReader br, DataOutputStream dos) throws IOException {
-        String requestBody = requestBodyFromPost(br);
+        String requestBody = getRequestBodyFromPost(br);
         Map<String, String> bodyParams = HttpRequestUtils.parseQueryParameter(requestBody);
 
         String userId = bodyParams.get("userId");
@@ -138,7 +139,7 @@ public class RequestHandler implements Runnable{
         }
     }
 
-    private String requestBodyFromPost(BufferedReader br) throws IOException {
+    private String getRequestBodyFromPost(BufferedReader br) throws IOException {
         int requestContentLength = 0;
 
         while (true) {                                              //해더 영역 스킵
@@ -152,6 +153,30 @@ public class RequestHandler implements Runnable{
         }
 
         return IOUtils.readData(br, requestContentLength);
+    }
+
+    private void handleUserListRequest(BufferedReader br, DataOutputStream dos) throws IOException {
+        boolean login = false;
+
+        while (true) {
+            final String line = br.readLine();
+            if (line.equals("")) {
+                break; // 빈 줄을 만나면 헤더 끝
+            }
+            if (line.startsWith("Cookie") && line.contains("logined=true")) {            // 쿠키 헤더 + 로그인 확인
+                login = true;
+            }
+        }
+
+        if(login){                                                                      //로그인 기록 확인
+            byte[] userList = Files.readAllBytes(Paths.get(WEBAPP_PATH + "/user/list.html"));
+            response200Header(dos, userList.length);
+            responseBody(dos, userList);
+        }
+        if(!login){
+            response302Header(dos, "/index.html");
+        }
+
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {     //성공적인 HTTP 응답 헤더를 클라이언트로 전송
@@ -189,7 +214,7 @@ public class RequestHandler implements Runnable{
     private void response302HeaderWithCookie(DataOutputStream dos, String url, String cookie) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found\r\n");
-            dos.writeBytes("Set-Cookie: " + cookie + "\r\n");
+            dos.writeBytes("Set-Cookie: " + cookie + "\r\n");                           //헤더로 쿠키 전송하여, 쿠키 설정
             dos.writeBytes("Location: " + url + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
