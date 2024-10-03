@@ -1,5 +1,6 @@
-package webserver;
+package http;
 
+import http.HttpRequest;
 import org.junit.jupiter.api.Test;
 import java.io.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,7 +9,7 @@ import static webserver.UserQueryKey.*;
 public class HttpRequestTest {
     @Test
     public void testHttpRequest() throws IOException {
-        InputStream is = new FileInputStream(new File("src/test/resources/HttpRequestSample.txt"));
+        InputStream is = new FileInputStream("src/test/resources/HttpRequestSample.txt");
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
         HttpRequest httpRequest = HttpRequest.from(br);

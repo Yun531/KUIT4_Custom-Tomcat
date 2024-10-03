@@ -14,13 +14,13 @@ public enum Url {
     URL_CSS("CSS");
 
 
-    final String value;
+    final String message;
 
-    private Url(String value){
-        this.value = value;
+    private Url(String message){
+        this.message = message;
     }
 
-    public String getValue() {
-        return value;
+    public String getMessage() {
+        return message;
     }
 }

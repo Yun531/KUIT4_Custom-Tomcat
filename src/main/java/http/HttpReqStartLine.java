@@ -1,11 +1,11 @@
-package webserver;
+package http;
 
-public class HttpStartLine {
+public class HttpReqStartLine {
     private final String method;
     private final String path;
     private final String version;
 
-    public HttpStartLine(String method, String path, String version) {
+    public HttpReqStartLine(String method, String path, String version) {
         this.method = method;
         this.path = path;
         this.version = version;
@@ -23,11 +23,11 @@ public class HttpStartLine {
         return version;
     }
 
-    public static HttpStartLine from(String startLine) {
+    public static HttpReqStartLine from(String startLine) {
         String[] tokens = startLine.split(" ");
         if (tokens.length != 3) {
             throw new IllegalArgumentException("Invalid HTTP Start Line");
         }
-        return new HttpStartLine(tokens[0], tokens[1], tokens[2]);
+        return new HttpReqStartLine(tokens[0], tokens[1], tokens[2]);
     }
 }
