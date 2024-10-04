@@ -11,17 +11,15 @@ import java.util.Map;
 
 import static Constant.HttpMethodType.*;
 import static Constant.Url.INDEX_HTML;
-import static Constant.UserQueryKey.*;
-import static Constant.UserQueryKey.EMAIL;
 
 public class SignUpController implements Controller{
     private final MemoryUserRepository userRepository = MemoryUserRepository.getInstance();
     @Override
     public void execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        if(httpRequest.getMethod().equals(GET.getValue())){
+        if(httpRequest.getMethod().equals(GET.getMessage())){
             handleSignUpGet(httpRequest, httpResponse);
         }
-        if(httpRequest.getMethod().equals(POST.getValue())){
+        if(httpRequest.getMethod().equals(POST.getMessage())){
             handleSignUpPost(httpRequest, httpResponse);
         }
 
@@ -49,7 +47,4 @@ public class SignUpController implements Controller{
 
         httpResponse.redirect(INDEX_HTML.getMessage());
     }
-
-
-
 }

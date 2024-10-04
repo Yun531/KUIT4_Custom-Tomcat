@@ -2,6 +2,7 @@ package http;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Map;
 
 import static Constant.HttpHeaderType.*;
 
@@ -23,7 +24,7 @@ public class HttpRequest {
         HttpReqStartLine httpReqStartLine = HttpReqStartLine.from(br.readLine());
         HttpReqHeader httpReqHeader = HttpReqHeader.from(br);
 
-        HttpReqBody httpReqBody = null;
+        HttpReqBody httpReqBody;
         if (httpReqHeader.getHeader(CONTENT_LENGTH.getValue()) != null) {                   //body 내용 있는지 확인
             int contentLength = Integer.parseInt(httpReqHeader.getHeader(CONTENT_LENGTH.getValue()));
             httpReqBody = HttpReqBody.from(br, contentLength);                    //body있을 경우 HttpBody 생성
@@ -49,6 +50,10 @@ public class HttpRequest {
 
     public String getHeader(String key) {
         return httpReqHeader.getHeader(key);
+    }
+
+    public Map<String, String> getHeaders(){
+        return httpReqHeader.getHeaders();
     }
 
     public String getBody(String key) {

@@ -1,7 +1,5 @@
 package webserver;
 
-import db.MemoryUserRepository;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,7 +13,6 @@ public class WebServer {
     private static final int DEFAULT_PORT = 80;
     private static final int DEFAULT_THREAD_NUM = 50;
     private static final Logger log = Logger.getLogger(WebServer.class.getName());
-    private static final MemoryUserRepository userRepository = MemoryUserRepository.getInstance();
 
     public static void main(String[] args) throws IOException {                         //서버를 시작하고, 클라이언트 연결을 관리
         int port = DEFAULT_PORT;
@@ -32,7 +29,7 @@ public class WebServer {
             Socket connection;
             while ((connection = welcomeSocket.accept()) != null) {
                 // 스레드에 작업 전달
-                service.submit(new RequestHandler(connection, userRepository));
+                service.submit(new RequestHandler(connection));
             }
         }
 

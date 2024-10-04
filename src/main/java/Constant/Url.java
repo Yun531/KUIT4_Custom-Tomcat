@@ -4,6 +4,7 @@ public enum Url {
 
     WEBAPP("webapp"),
     INDEX_HTML("/index.html"),
+    ROOT("/"),
     USER_FORM_HTML("/user/form.html"),
     USER_SIGNUP("/user/signup"),
     USER_LOGIN("/user/login"),
@@ -16,7 +17,7 @@ public enum Url {
 
     final String message;
 
-    private Url(String message){
+    Url(String message){
         this.message = message;
     }
 

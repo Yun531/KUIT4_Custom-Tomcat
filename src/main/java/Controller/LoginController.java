@@ -16,7 +16,7 @@ public class LoginController implements Controller {
     private final MemoryUserRepository userRepository = MemoryUserRepository.getInstance();
     @Override
     public void execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        if (httpRequest.getMethod().equals((POST.getValue()))) {
+        if (httpRequest.getMethod().equals((POST.getMessage()))) {
             handleLoginPost(httpRequest, httpResponse);
         }
     }

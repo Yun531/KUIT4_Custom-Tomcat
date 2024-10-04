@@ -4,13 +4,13 @@ public enum HttpMethodType {
     GET("GET"),
     POST("POST");
 
-    final String value;
+    final String message;
 
-    private HttpMethodType(String value) {
-        this.value = value;
+    HttpMethodType(String message) {
+        this.message = message;
     }
 
-    public String getValue() {
-        return value;
+    public String getMessage() {
+        return message;
     }
 }
