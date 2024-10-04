@@ -1,16 +1,16 @@
 package http;
 
-import webserver.HttpHeaderType;
-import webserver.StatusCode;
+import Constant.HttpHeaderType;
+import Constant.StatusCode;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static webserver.HttpContentType.*;
-import static webserver.HttpHeaderType.*;
-import static webserver.StatusCode.*;
-import static webserver.Url.*;
+import static Constant.HttpContentType.*;
+import static Constant.HttpHeaderType.*;
+import static Constant.StatusCode.*;
+import static Constant.Url.*;
 
 public class HttpResponse {
     private final DataOutputStream dos;

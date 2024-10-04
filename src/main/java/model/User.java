@@ -1,6 +1,12 @@
 package model;
 
+import http.HttpRequest;
+
+import java.util.Map;
 import java.util.Objects;
+
+import static Constant.UserQueryKey.*;
+import static Constant.UserQueryKey.EMAIL;
 
 //사용자의 정보를 담는 도메인 객체
 //사용자의 ID, 비밀번호, 이름, 이메일
@@ -15,6 +21,23 @@ public class User {
         this.password = password;
         this.name = name;
         this.email = email;
+    }
+
+    public static User from(Map<String, String> queryParams){
+        String userId = queryParams.get(USERID.getValue());
+        String password = queryParams.get(PASSWORD.getValue());
+        String name = queryParams.get(NAME.getValue());
+        String email = queryParams.get(EMAIL.getValue());
+
+        return new User(userId, password, name, email);
+    }
+    public static User from(HttpRequest httpRequest){
+        String userId = httpRequest.getBody(USERID.getValue());
+        String password = httpRequest.getBody(PASSWORD.getValue());
+        String name = httpRequest.getBody(NAME.getValue());
+        String email = httpRequest.getBody(EMAIL.getValue());
+
+        return new User(userId, password, name, email);
     }
 
     public String getUserId() {

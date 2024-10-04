@@ -3,7 +3,7 @@ package http;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import static webserver.HttpHeaderType.*;
+import static Constant.HttpHeaderType.*;
 
 public class HttpRequest {
     private final HttpReqStartLine httpReqStartLine;

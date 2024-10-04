@@ -1,6 +1,6 @@
 package http;
 
-import webserver.HttpHeaderType;
+import Constant.HttpHeaderType;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,10 +1,9 @@
 package http;
 
-import http.HttpRequest;
 import org.junit.jupiter.api.Test;
 import java.io.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static webserver.UserQueryKey.*;
+import static Constant.UserQueryKey.*;
 
 public class HttpRequestTest {
     @Test

@@ -1,6 +1,6 @@
 package http;
 
-import webserver.StatusCode;
+import Constant.StatusCode;
 
 public class HttpResStartLine {
     private final String version;
