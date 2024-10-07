@@ -23,6 +23,10 @@ public class User {
         this.email = email;
     }
 
+    public static User from(String userId, String password, String name, String email) {
+        return new User(userId, password, name, email);
+    }
+
     public static User from(Map<String, String> queryParams){
         String userId = queryParams.get(USERID.getValue());
         String password = queryParams.get(PASSWORD.getValue());

@@ -16,9 +16,10 @@ public class ForwardController implements Controller {
     public void execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         if (Files.exists(Paths.get(WEBAPP + httpRequest.getPath()))) {
             httpResponse.forward(httpRequest.getPath());
-        } else {
-            httpResponse.setStatus(NOT_FOUND);
-            //httpResponse.forward("404 페이지"); 404 페이지 없어서 주석처리
+            return;
         }
+
+        httpResponse.setStatus(NOT_FOUND);
+        //httpResponse.forward("404 페이지"); 404 페이지 없어서 주석처리
     }
 }

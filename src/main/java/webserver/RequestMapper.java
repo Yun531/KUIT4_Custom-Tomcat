@@ -14,7 +14,7 @@ import static Constant.Url.*;
 public class RequestMapper {
     private final HttpRequest httpRequest;
     private final HttpResponse httpResponse;
-    private final Map<String, Controller> controllers;
+    private final Map<String, Controller> controllers;      //싱글톤 패턴 사용해서 관리하는거 추천
 
     public RequestMapper(HttpRequest httpRequest, HttpResponse httpResponse){
         this.httpRequest = httpRequest;

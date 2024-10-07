@@ -30,9 +30,10 @@ public class LoginController implements Controller {
         if (user != null && user.getPassword().equals(password)) {
             httpResponse.addHeader(COOKIE, "logined=true");
             httpResponse.redirect(INDEX_HTML.getMessage());
-        } else {
-            httpResponse.redirect(USER_LOGIN_FAILED_HTML.getMessage());
+            return;
         }
+
+        httpResponse.redirect(USER_LOGIN_FAILED_HTML.getMessage());
     }
 }
 

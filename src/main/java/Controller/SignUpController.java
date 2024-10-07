@@ -11,6 +11,8 @@ import java.util.Map;
 
 import static Constant.HttpMethodType.*;
 import static Constant.Url.INDEX_HTML;
+import static Constant.UserQueryKey.*;
+import static Constant.UserQueryKey.EMAIL;
 
 public class SignUpController implements Controller{
     private final MemoryUserRepository userRepository = MemoryUserRepository.getInstance();
@@ -39,7 +41,10 @@ public class SignUpController implements Controller{
     }
 
     private void handleSignUpPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        User user = User.from(httpRequest);
+       // User user = User.from(httpRequest);   //httpRequest의 맴버 변수를 꺼내서 User의 생성자로 넣어주는게 좋다는 의미인가?
+                                                //파라미터로 httpRequest 하나 넘겨주는게 깔끔한것 같았는데 좋지 않은 방향인듯
+        User user = User.from(httpRequest.getBody(USERID.getValue()), httpRequest.getBody(PASSWORD.getValue()),
+                                httpRequest.getBody(NAME.getValue()), httpRequest.getBody(EMAIL.getValue()));
 
         if (userRepository.findUserById(user.getUserId()) == null) {
             userRepository.addUser(user);
